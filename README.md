@@ -1,29 +1,10 @@
 # .Net Core Sonar Scanner on Docker Container
 
-Sonar Scanner MsBuild Dockerfile for .Net Core Projects
+Sonar Scanner Dockerfile for .Net Core Projects
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/burakince/docker-dotnet-sonarscanner.svg)](https://hub.docker.com/r/burakince/docker-dotnet-sonarscanner/) [![Docker Automated build](https://img.shields.io/docker/automated/burakince/docker-dotnet-sonarscanner.svg)](https://hub.docker.com/r/burakince/docker-dotnet-sonarscanner/) [![Docker Build Status](https://img.shields.io/docker/build/burakince/docker-dotnet-sonarscanner.svg)](https://hub.docker.com/r/burakince/docker-dotnet-sonarscanner/)
+This is based on the burakince/docker-dotnet-sonarscanner image but updated to work nicely with dotnet 3.1 and 5.0
 
-## This Image Using
-
-|                | Name          | Version       |
-| -------------- |:-------------:| -------------:|
-| OS             | Debian        |   Stretch (9) |
-| Java           | OpenJDK       |  8 Update 171 |
-| .NET Framework | Mono          |    5.12.0.226 |
-| .NET SDK       | .NET Core SDK |           3.1 |
-| Sonar Scanner  | CLI           |    3.2.0.1227 |
-| Sonar Scanner  | MS Build      |    4.3.1.1372 |
-
-Please check [Releases Page](https://github.com/burakince/docker-dotnet-sonarscanner/releases) for details.
-
-## Latest Versions
-
-[Latest Debian](https://www.debian.org/releases/stable/)
-[Latest OpenJDK](https://hub.docker.com/r/library/openjdk/tags/)
-[Latest Mono](https://www.mono-project.com/download/stable/#download-lin-debian)
-[Latest .Net SDK](https://www.microsoft.com/net/download/all)
-[Latest Sonar Scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+MSBuild)
+[![Docker Pulls](https://img.shields.io/docker/pulls/alexwoollam/docker-dotnet-sonarscanner.svg)](https://hub.docker.com/r/alexwoollam/docker-dotnet-sonarscanner/) [![Docker Automated build](https://img.shields.io/docker/automated/alexwoollam/docker-dotnet-sonarscanner.svg)](https://hub.docker.com/r/alexwoollam/docker-dotnet-sonarscanner/) [![Docker Image Size](https://img.shields.io/docker/image-size/alexwoollam/docker-dotnet-sonarscanner)](https://hub.docker.com/r/alexwoollam/docker-dotnet-sonarscanner/)
 
 ## Using Example
 
@@ -33,16 +14,7 @@ First of all you need a sonarqube server. If you haven't one, run this code;
 docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube
 ```
 
-And then you need .Net Core project. If you haven't one, run this codes;
-
-```
-mkdir ConsoleApplication1
-cd ConsoleApplication1
-
-dotnet new console
-dotnet new sln
-dotnet sln ConsoleApplication1.sln add ConsoleApplication1.csproj
-```
+And then you need .Net Core project.
 
 Take login token from sonarqube server, change working directory to project directory and run this code;
 
@@ -53,7 +25,7 @@ docker run --name dotnet-scanner -it --rm -v $(pwd):/project \
   -e PROJECT_VERSION=1.0 \
   -e HOST=http://localhost:9000 \
   -e LOGIN_KEY=CHANGE_THIS_ONE \
-  burakince/docker-dotnet-sonarscanner
+  alexwoollam/docker-dotnet-sonarscanner
 ```
 
 Note: If you have sonarqube as docker container, you must inspect sonarqube's bridge network IP address and use it in HOST variable.
@@ -61,3 +33,46 @@ Note: If you have sonarqube as docker container, you must inspect sonarqube's br
 ```
 docker network inspect bridge
 ```
+
+Works well with docker-compose, e.g. something like:
+_docker-compose.sonarqube.yml_
+```
+
+version: "3.7"
+
+services:
+
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:latest
+    ports:
+      - "9000:9000"
+    networks:
+      - sonarnet
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_conf:/opt/sonarqube/conf
+
+  sonarscanner:
+    container_name: sonarscanner
+    image: alexwoollam/docker-dotnet-sonarscanner:3.1
+    networks:
+      - sonarnet
+    volumes:
+      - ./:/project
+    environment:
+      - PROJECT_KEY=Project.Key
+      - PROJECT_NAME=Project.Name
+      - PROJECT_VERSION=1.0
+      - HOST=http://sonarqube:9000
+      - LOGIN_KEY=login.key
+
+networks:
+  sonarnet:
+
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+
+```
+then `docker-compose -f ./docker-compose.sonarqube.yml up -d`
