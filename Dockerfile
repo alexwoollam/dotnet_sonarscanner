@@ -2,10 +2,9 @@ FROM openjdk:11.0-jre-stretch
 
 LABEL maintainer="Alexander Woollam <x@w5m.io>"
 
-ENV SONAR_SCANNER_MSBUILD_VERSION=4.3.1.1372 \
-    SONAR_SCANNER_VERSION=3.2.0.1227 \
+ENV SONAR_SCANNER_MSBUILD_VERSION=5.2.1.31210 \
+    SONAR_SCANNER_VERSION=8.5.1 \
     DOTNET_SDK_VERSION=5.0 \
-    MONO_DEBIAN_VERSION=5.12.0.226-0xamarin3+debian9b1 \
     SONAR_SCANNER_MSBUILD_HOME=/opt/sonar-scanner-msbuild \
     DOTNET_PROJECT_DIR=/project \
     DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true \
@@ -26,17 +25,10 @@ RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod
 
 RUN  apt-get update \
   && apt-get install -y dotnet-sdk-$DOTNET_SDK_VERSION
-  
-RUN wget https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/$SONAR_SCANNER_MSBUILD_VERSION/sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-net46.zip -O /opt/sonar-scanner-msbuild.zip \
-  && mkdir -p $SONAR_SCANNER_MSBUILD_HOME \
-  && mkdir -p $DOTNET_PROJECT_DIR \
-  && unzip /opt/sonar-scanner-msbuild.zip -d $SONAR_SCANNER_MSBUILD_HOME \
-  && rm /opt/sonar-scanner-msbuild.zip \
-  && chmod 775 $SONAR_SCANNER_MSBUILD_HOME/*.exe \
-  && chmod 775 $SONAR_SCANNER_MSBUILD_HOME/**/bin/* \
-  && chmod 775 $SONAR_SCANNER_MSBUILD_HOME/**/lib/*.jar
 
-ENV PATH="$SONAR_SCANNER_MSBUILD_HOME:$SONAR_SCANNER_MSBUILD_HOME/sonar-scanner-$SONAR_SCANNER_VERSION/bin:${PATH}"
+RUN dotnet tool install --global dotnet-sonarscanner
+
+ENV PATH="$PATH:/root/.dotnet/tools"
 
 COPY run.sh $SONAR_SCANNER_MSBUILD_HOME/sonar-scanner-$SONAR_SCANNER_VERSION/bin/
 
