@@ -8,7 +8,7 @@ PROJECT_VERSION="${PROJECT_VERSION:-1.0}"
 SONAR_HOST="${HOST:-http://localhost:9000}"
 SONAR_LOGIN_KEY="${LOGIN_KEY:-admin}"
 
-dotnet sonarscanner begin /k:$PROJECT_KEY /d:sonar.host.url=$HOST
+dotnet sonarscanner begin /k:$PROJECT_KEY /d:sonar.host.url=$HOST /v:$PROJECT_VERSION
 dotnet build
 dotnet test
 dotnet sonarscanner
