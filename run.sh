@@ -10,7 +10,8 @@ PROJECT_VERSION="${PROJECT_VERSION:-1.0}"
 SONAR_HOST="${HOST:-http://localhost:9000}"
 SONAR_LOGIN_KEY="${LOGIN_KEY:-admin}"
 
-dotnet sonarscanner begin /k:$PROJECT_KEY /d:sonar.host.url=$HOST /v:$PROJECT_VERSION-$DT /d:sonar.cs.opencover.reportsPaths="coverage.opencover.xml" /d:sonar.coverage.exclusions="**Tests*.cs"
-dotnet build
 dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-dotnet sonarscanner
+dotnet build-server shutdown
+dotnet sonarscanner begin /k:$PROJECT_KEY /d:sonar.host.url=$HOST /v:$PROJECT_VERSION-$DT /d:sonar.cs.opencover.reportsPaths="/project/$COVERAGE_PATH"
+dotnet build
+dotnet sonarscanner end
