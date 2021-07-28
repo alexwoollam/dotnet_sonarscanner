@@ -17,6 +17,7 @@ RUN apt-get update \
     apt-transport-https \
     wget \
     unzip \
+    tzdata \
     -y
 
 # Install .NET Core SDK
@@ -29,6 +30,8 @@ RUN dotnet_sdk_version=3.1.409 \
     && rm dotnet.tar.gz \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
     && dotnet tool install --global dotnet-sonarscanner
+
+ENV TZ=Europe/London
 
 ENV PATH="$PATH:/root/.dotnet/tools:$SONAR_SCANNER_MSBUILD_HOME:$SONAR_SCANNER_MSBUILD_HOME/sonar-scanner-$SONAR_SCANNER_VERSION/bin:${PATH}"
 
