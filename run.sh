@@ -11,5 +11,5 @@ SONAR_LOGIN_KEY="${LOGIN_KEY:-admin}"
 
 dotnet sonarscanner begin /k:$PROJECT_KEY /d:sonar.host.url=$HOST /v:$PROJECT_VERSION-$DT
 dotnet build
-dotnet test
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 dotnet sonarscanner
