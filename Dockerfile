@@ -29,6 +29,7 @@ RUN dotnet_sdk_version=3.1.409 \
     && tar -ozxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
+    && dotnet --version
     && dotnet tool install --global dotnet-sonarscanner
 
 ENV TZ=Europe/London
