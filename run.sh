@@ -12,6 +12,6 @@ SONAR_LOGIN_KEY="${LOGIN_KEY:-admin}"
 
 dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 dotnet build-server shutdown
-dotnet sonarscanner begin /k:$PROJECT_KEY /d:sonar.host.url=$HOST /v:$PROJECT_VERSION-$DT /d:sonar.cs.opencover.reportsPaths="/project/$COVERAGE_PATH"
+dotnet sonarscanner begin /k:$PROJECT_KEY /d:sonar.host.url=$HOST /v:$PROJECT_VERSION-$DT /d:sonar.login="$SONAR_LOGIN_KEY" /d:sonar.cs.opencover.reportsPaths="/project/$COVERAGE_PATH"
 dotnet build
 dotnet sonarscanner end
